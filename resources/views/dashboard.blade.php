@@ -588,7 +588,7 @@ async function loadServices() {
 }
 
 loadServices();
-setInterval(loadServices, 3000);
+setInterval(loadServices, 300);
 
 </script>
 

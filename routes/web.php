@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    // Cache::forget('services');
+
     return view('dashboard');
 });
 

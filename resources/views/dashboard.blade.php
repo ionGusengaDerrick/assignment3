@@ -74,7 +74,7 @@
 
         <section class="health-panel">
             <div class="health-header">
-                <strong>Fleet health</strong>
+                <strong>Projects health</strong>
                 <span id="healthPercent">0% online</span>
             </div>
             <div class="health-bar">

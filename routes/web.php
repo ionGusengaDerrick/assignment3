@@ -1,69 +1,63 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route; 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    // Cache::forget('services');
-
+    Cache::forget('services');
     return view('dashboard');
-});
-
-Route::post('/register', function (Request $request) {
-
-    $services = Cache::get('services', []);
-
-    $services[$request->name] = [
-        'name' => $request->name,
-        'project' => $request->project,
-        'url' => $request->url,
-        'last_seen' => time(),
-        'status' => 'Online'
-    ];
-
-    Cache::put('services', $services);
-
-    return response()->json([
-        'message' => 'registered'
-    ]);
-});
+}); 
 
 Route::post('/ping', function (Request $request) {
 
-    $services = Cache::get('services', []);
+    //validate request
+    $request->validate([
+        'name' => 'required|string',
+        'project_name' => 'required|string',
+        'url' => 'required|string',
+    ]);
 
-    if (isset($services[$request->name])) {
+     // get existing services from cache
+     $services = Cache::get('services', []);
 
-        $services[$request->name]['last_seen'] = time();
+     $name = $request->name; 
 
-        Cache::put('services', $services);
-    }
+     // create/update service
+    $services[$name] = [
+        'name' => $request->name,
+        'project_name' => $request->project_name,
+        'url' => $request->url,
+        'last_seen' => time(),
+        'status' => 'online',
+    ];
+
+     // save globally
+     Cache::put('services', $services);
+
+    // log current services
+    // Log::info('services', ['services' => $services]);
 
     return response()->json([
-        'message' => 'ping received'
+        'message' => 'Ping received',
     ]);
+
 });
 
 Route::get('/services', function () {
 
+    // get existing services from cache
     $services = Cache::get('services', []);
-
     $now = time();
 
     foreach ($services as $key => $service) {
-
-        if (($now - $service['last_seen']) > 10) {
-
-            $services[$key]['status'] = 'Offline';
-
-        } else {
-
-            $services[$key]['status'] = 'Online';
-        }
+        $services[$key]['status'] =
+            ($now - $service['last_seen']) > 5
+            ? 'offline'
+            : 'online';
     }
 
-    Cache::put('services', $services);
-
-    return response()->json($services);
+    return response()->json([
+        'services' => array_values($services)
+    ]);
 });

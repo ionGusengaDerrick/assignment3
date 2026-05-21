@@ -33,6 +33,8 @@
     <header class="topbar">
         <h1>Dashboard</h1>
         <div class="topbar-meta">
+            <span class="refresh-badge" id="liveStatus">Live updates · no page reload</span>
+            <span id="lastUpdated">—</span>
         </div>
     </header>
 
@@ -109,76 +111,7 @@
     </div>
 </div>
 
-<script>
-
-async function loadServices() {
-
-    const response = await fetch('/services');
-    const services = await response.json();
-    const keys = Object.keys(services);
-
-    let online = 0;
-    let offline = 0;
-
-    for (const key of keys) {
-        if (services[key].status === 'Online') online++;
-        else offline++;
-    }
-
-    const total = keys.length;
-    const pct = total ? Math.round((online / total) * 100) : 0;
-
-    document.getElementById('statTotal').textContent = total;
-    document.getElementById('statOnline').textContent = online;
-    document.getElementById('statOffline').textContent = offline;
-    document.getElementById('healthPercent').textContent = pct + '% online';
-    document.getElementById('healthFill').style.width = pct + '%';
-    document.getElementById('serviceCount').textContent =
-        total + (total === 1 ? ' service' : ' services');
-
-    const tbody = document.getElementById('tableBody');
-    const emptyState = document.getElementById('emptyState');
-    const tableWrap = document.querySelector('.table-wrap');
-
-    if (total === 0) {
-        tbody.innerHTML = '';
-        emptyState.style.display = 'block';
-        tableWrap.style.display = 'none';
-    } else {
-        emptyState.style.display = 'none';
-        tableWrap.style.display = 'block';
-
-        let rows = '';
-
-        for (const key of keys) {
-            const s = services[key];
-            const isOnline = s.status === 'Online';
-
-            rows += `
-                <tr>
-                    <td><span class="project-tag">${s.project}</span></td>
-                    <td>
-                        <span class="badge ${isOnline ? 'online' : 'offline'}">${s.status}</span>
-                    </td>
-                    <td>${s.name}</td>
-                    <td>
-                        <a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.url}</a>
-                    </td>
-                </tr>
-            `;
-        }
-
-        tbody.innerHTML = rows;
-    }
-
-    document.getElementById('lastUpdated').textContent =
-        new Date().toLocaleTimeString();
-}
-
-loadServices();
-setInterval(loadServices, 300);
-
-</script>
+<script src="{{ asset('js/dashboard.js') }}" defer></script>
 
 </body>
 </html>

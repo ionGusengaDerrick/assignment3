@@ -6,20 +6,10 @@ use Illuminate\Http\Request;
 
 class RegistryController extends Controller
 {
-    protected $services = [];
-    public function register_app(Request $request) {
-
-        dd('services');
-        $services[$request->name] = [
-            'name' => $request->name,
-            'project' => $request->project,
-            'url' => $request->url,
-            'last_seen' => time(),
-            'status' => 'Online'
-        ];
-
+    public function register_app(Request $request)
+    {
         return response()->json([
-            'message' => 'Registered'
+            'message' => 'Use POST /register in routes/web.php',
         ]);
     }
 }
